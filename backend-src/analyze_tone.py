@@ -1,8 +1,6 @@
 import json
 from watson_developer_cloud import ToneAnalyzerV3
 
-
-
 def process_text(text):
 	tone_analyzer = ToneAnalyzerV3(
 	    version='2017-09-21',
