@@ -1,6 +1,7 @@
 import requests
 from time import sleep
 import analyze_tone
+import analyze_pace
 
 filler_file="filler_words.txt"
 filler_words=set()
@@ -10,13 +11,19 @@ with open(filler_file, "r+") as f:
 
 def process_audio(ID=None):
 	response=audio_to_text(ID)
-	output, portions, colors=parse_response(response)
+	output, portions, colors=get_text_and_fillers(response)
 	tone=analyze_tone.process_text(output)
-	results_dict={"string_output": output, "tokens": portions, "colors_dict": colors, "tone": tone}
+	pause_after_sent, pause_after_comma, words_per_min=analyze_pace.prcoess_response(response)
+
+	results_dict={"string_output": output, "tokens": portions, 
+				"colors_dict": colors, "tone": tone, "pause_after_sent": pause_after_sent, 
+				"pause_after_comma": pause_after_comma, "words_per_min": words_per_min}
+				
 	return results_dict
 
 def audio_to_text(ID):
 	'''
+	This function generates a dictionary representation of text from an audio file using the REV API. 
 	'''
 	new_headers= {
 	   	'Authorization': 'Bearer 01wXudOy88gdkI2HgWeZUrc1WEp5GtFA5XK9KFNv6O7ucF6e5Nwe47CXm3cAbMAFHML56xeOQy0Ya99FFVwF7dqrzitwc',
@@ -44,7 +51,7 @@ def audio_to_text(ID):
 
 	return response2
 
-def parse_response(response2):
+def get_text_and_fillers(response2):
 	colors={"blue": set()}
 	text_portions=[]
 	output=""
@@ -61,4 +68,4 @@ def parse_response(response2):
 	return output, text_portions, colors
 
 
-print(audio_to_text())
+print("OUTPUT:", "\n", "\n", "\n", str(process_audio()))

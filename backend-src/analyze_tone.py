@@ -11,4 +11,5 @@ def process_text(text):
 
 	tone_analysis = tone_analyzer.tone(
 		{'text': text},'application/json').get_result()
+	input(json.dumps(tone_analysis, indent=2))
 	return json.dumps(tone_analysis, indent=2)
