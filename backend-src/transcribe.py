@@ -13,12 +13,12 @@ def process_audio(ID=None):
 	response=audio_to_text(ID)
 	output, portions, colors=get_text_and_fillers(response)
 	tone=analyze_tone.process_text(output)
-	pause_after_sent, pause_after_comma, words_per_min=analyze_pace.prcoess_response(response)
+	pause_after_sent, pause_after_comma, words_per_min=analyze_pace.process_response(response)
 
 	results_dict={"string_output": output, "tokens": portions, 
 				"colors_dict": colors, "tone": tone, "pause_after_sent": pause_after_sent, 
 				"pause_after_comma": pause_after_comma, "words_per_min": words_per_min}
-				
+
 	return results_dict
 
 def audio_to_text(ID):
@@ -64,6 +64,8 @@ def get_text_and_fillers(response2):
 		if elem["value"].lower() in filler_words:
 			print("F: "+elem["value"]+"\n")
 			colors["blue"].add(ind)
+
+	print("OUT:", output, "\n")
 
 	return output, text_portions, colors
 
