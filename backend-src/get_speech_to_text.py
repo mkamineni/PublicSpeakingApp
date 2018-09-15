@@ -1,13 +1,21 @@
 import requests
 from time import sleep
+import analyze_tone
 
 filler_file="filler_words.txt"
 filler_words=set()
 with open(filler_file, "r+") as f:	
 	for line in f:
-		filler_words.add(line)
+		filler_words.add(line.strip())
 
-def audio_to_text(ID=None):
+def process_audio(ID=None):
+	response=audio_to_text(ID)
+	output, portions, colors=parse_response(response)
+	tone=analyze_tone.process_text(output)
+	results_dict={"string_output": output, "tokens": portions, "colors_dict": colors, "tone": tone}
+	return results_dict
+
+def audio_to_text(ID):
 	'''
 	'''
 	new_headers= {
@@ -26,7 +34,6 @@ def audio_to_text(ID=None):
 		response = requests.post('https://api.rev.ai/revspeech/v1beta/jobs', headers=headers, data=data).json()
 		ID=response["id"]
 
-		print(ID)
 		status=response["status"]
 		while status!='transcribed':
 			sleep(30)
@@ -35,24 +42,23 @@ def audio_to_text(ID=None):
 
 	response2 = requests.get('https://api.rev.ai/revspeech/v1beta/jobs/'+str(ID)+'/transcript', headers=new_headers).json()
 
-	text=parse_response(response2)
-	return text
+	return response2
 
 def parse_response(response2):
 	colors={"blue": set()}
-	text=[]
+	text_portions=[]
 	output=""
 	parts=response2["monologues"][0]["elements"]
 
 	for ind in range(len(parts)):
 		elem=parts[ind]
-		text.append(elem["value"])
+		text_portions.append(elem["value"])
 		output+=elem["value"]
 		if elem["value"].lower() in filler_words:
 			print("F: "+elem["value"]+"\n")
 			colors["blue"].add(ind)
 
-	return text, output, colors
+	return output, text_portions, colors
 
 
 print(audio_to_text())
