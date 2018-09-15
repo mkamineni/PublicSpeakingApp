@@ -1,0 +1,8 @@
+node_modules/
+.expo/
+npm-debug.*
+*.DS_Store
+ios/build/
+ios/mobile-client.xcworkspace/xcuserdata/
+ios/mobile-client.xcodeproj/project.xcworkspace/
+.vscode/
