@@ -10,8 +10,11 @@ export default class App extends React.Component {
       data: []
     };
   }
+
+  //define more functions later as needed
+
   sendVideo(page, values) {
-    this.setState({ loading: 'sendVideo'});
+    this.setState({ loading: 'sendVideo'}); //check the loading prop in lower components, if its not an empty string display a loading circle
     const body = { form: values};
     fetch(`/api/send`, {
       method: 'POST',
@@ -40,6 +43,10 @@ export default class App extends React.Component {
       );
   }
 
+  handleData = { //contains functions, maybe like retrieveGraph or something
+    sendVideo: this.sendVideo
+  }
+
   render() {
     const styles = StyleSheet.create({
       container: {
@@ -49,7 +56,7 @@ export default class App extends React.Component {
         justifyContent: 'center',
       },
     });
-    return (
+    return ( //return a component page that sends in handleData as a prop, as well as the data prop
       <View style={styles.container}>
         <Text>Open up App.js to start working on your app!</Text>
         <Text>Changes you make will automatically reload.</Text>
