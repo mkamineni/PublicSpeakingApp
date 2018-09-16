@@ -1,7 +1,10 @@
 import requests
 from time import sleep
+import urllib2
+
 import analyze_tone
 import analyze_pace
+from track_eyes import evaluate_focus
 from image_analysis import process_video
 
 filler_file="filler_words.txt"
@@ -14,11 +17,17 @@ def process_audio(url, ID=None):
 	response=audio_to_text(ID, url)
 	output, tokens, colors, filler_freqs=get_text_and_fillers(response)
 	tone_of_text=analyze_tone.process_text(output)
-	pause_after_sent, pause_after_comma, words_per_min=analyze_pace.process_response(response)
+	pause_after_sent, pause_after_comma, words_per_min, time_length=analyze_pace.process_response(response)
+
+	rsp = urllib2.urlopen(url)
+	with open("video.mov",'wb') as f:
+    	f.write(rsp.read())
+	off_center_counter=evaluate_focus("video.mov")
+	average_focus=time_length/off_center_counter
 
 	percentage_filler=sum(filler_freqs[freq] for freq in filler_freqs)/len(tokens)
-	users_stats=[pause_after_sent, pause_after_comma, words_per_min, percentage_filler, filler_freqs, tone_of_text]
-	ideal_stats=[2, 1, 150, 0, None, None]
+	users_stats=[pause_after_sent, pause_after_comma, words_per_min, percentage_filler, filler_freqs, average_focus, tone_of_text]
+	ideal_stats=[2, 1, 150, 0, None, None, None]
 
 	smile, datasets=process_video(url)
 

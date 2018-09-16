@@ -1,12 +1,16 @@
+import os
 import cv2
 import scipy.misc
 import numpy
 import requests
 
-def process_video(video):
+def evaluate_focus(video):
 	cap = cv2.VideoCapture(video)
 
+	off_center_counter=0
+	last_off_center=0
 	counter=0
+
 	while(cap.isOpened()):
 	    counter+=1
 	    ## Read Image
@@ -37,12 +41,18 @@ def process_video(video):
 	        # draw the center of the circle
 	        cv2.circle(image,(circle[0],circle[1]),2,(0,0,255),3)
 
-	    off_center=get_off_center(locations_y[min_index], locations_y[min_index+1])
 	    scipy.misc.imsave('detected circles '+str(counter)+'.jpg', image)
+	    off_center=get_off_center(locations_y[min_index], locations_y[min_index+1], 'detected circles '+str(counter)+'.jpg')
+	    if off_center>0 and last_off_center<0 or off_center<0 and last_off_center>0 and abs(last_off_center-off_center)>30:
+	    	off_center_counter+=1
+	    elif abs(last_off_center-off_center)>50:
+	    	off_center_counter+=1
+	    last_off_center=off_center 
+	    os.remove('detected circles '+str(counter)+'.jpg')
 
 	cap.release()
 
-	return video
+	return off_center_counter
 
 def get_irises_location(frame_gray):
     eye_cascade = cv2.CascadeClassifier('C:/Users/mkami/Anaconda3/Lib/site-packages/cv2/data/haarcascade_eye.xml')
@@ -56,7 +66,17 @@ def get_irises_location(frame_gray):
 
     return numpy.array(irises)
 
-def get_off_center(point1, point2):
+def get_off_center(point1, point2, image):
+	params = (
+	    ('version', '2018-03-19'),
+	)
+
+	files= {'media': (image, open(image, 'rb'), 'jpg')}
+	response = requests.post('https://gateway.watsonplatform.net/visual-recognition/api/v3/detect_faces', files=files, 
+		params=params, auth=('apikey', 'Aw5ZZ5ZHQPbUxqwueLo9afcUeFJIjEjLe5woFSt2Uztb')).json()
+	loc=response["images"][0]["faces"][0]["face_location"]
+	avg=loc["left"]+loc["width"]/2
+	return (point1[1]+point2[1])/2-avg
 
 video='vlog.mov'
 process_video(video)

@@ -27,7 +27,7 @@ def process_response(response):
 		else:
 			period, comma=False, False
 
-	words_per_min=end/(60*len(parts))
+	words_per_min=len(parts)/(end/60)
 
 	pause_after_sent, pause_after_comma= None, None
 
@@ -37,4 +37,4 @@ def process_response(response):
 	if num_commas:
 		pause_after_comma=total_space_after_comma/num_commas
 
-	return pause_after_sent, pause_after_comma, words_per_min
+	return pause_after_sent, pause_after_comma, words_per_min, time_length
