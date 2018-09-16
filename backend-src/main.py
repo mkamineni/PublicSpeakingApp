@@ -3,17 +3,21 @@ app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['TESTING'] = True
 
-from transcribe import audio_to_text
+from transcribe import process_audio
 
 @app.route('/')
 def hello_world():
 	return "hi"
 
-@app.route('/analyze', methods=['POST'])
+@app.route('/analyze', methods=['GET','POST'])
 def analyze_video():
-	print('Hello world!', file=sys.stderr)
+	app.logger.info('Hello world!')
 	body = request.get_json()
-	print(body, file=sys.stderr)
-	output = audio_to_text(body)
-	print('OUTPUT HERE', file=sys.stderr)
+	print(body)
+	output = ('None', 'None', 'None')
+	if body and body.form and body.form.fileUrl:
+		result = process_audio(body.form.fileUrl)
+		if result:
+			output = result
+	print('OUTPUT HERE')
 	return output

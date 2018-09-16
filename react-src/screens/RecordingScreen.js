@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, CameraRoll } from 'rea
 import { Camera, Permissions } from 'expo';
 import { RNS3 } from 'react-native-aws3';
 import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } from '../secret';
+import RecordingButton from '../components/RecordButton';
 
 
 export default class RecordingScreen extends Component {
@@ -10,7 +11,6 @@ export default class RecordingScreen extends Component {
         super(props);
         this.state = {
             hasCameraPermission: null,
-            hasAudioPermission: null,
             isRecording: false,
             fileUrl: null,
             isDoneRecording: false,
@@ -110,9 +110,15 @@ export default class RecordingScreen extends Component {
           this.setState({ isRecording: true, fileUrl: null });
           this.camera.recordAsync({ quality: '4:3' })
             .then((file) => {
-              this.setState({ fileUrl: file.uri});
-              CameraRoll.saveToCameraRoll(file.uri, "video");
-              this.uploadVideo(file.uri);
+                Alert.alert(
+                    'Use This Video?',
+                    'Would you like to analyze this video?',
+                    [
+                        {text: 'Cancel', onPress: () => this.cancelVideo()},
+                        {text: 'OK', onPress: () => this.useVideo(file.uri)},
+                    ],
+                    { cancelable: false }
+                );
             });
         }
     }
@@ -121,6 +127,24 @@ export default class RecordingScreen extends Component {
         this.camera.stopRecording();
         this.setState({ isDoneRecording: true, isRecording: false });
     };
+
+    useVideo = (url) => {
+        this.setState({ fileUrl: url});
+        CameraRoll.saveToCameraRoll(url, "video");
+        this.uploadVideo(url);
+    }
+
+    cancelVideo = () => {
+        this.setState({
+            isRecording: false,
+            fileUrl: null,
+            isDoneRecording: false,
+            loading: '',
+            msg: '',
+            data: [],
+        });
+        this.props.navigation.navigate('Start')
+    }
 
     render() {
         const { hasVideoPermission} = this.state;
@@ -137,7 +161,10 @@ export default class RecordingScreen extends Component {
             footer: {
                 height: 85,
                 flexDirection: 'row',
-                backgroundColor: '#78a6f299',
+                flex: 1,
+                alignItems: 'flex-end',
+                justifyContent: 'center',
+                padding: 15,
             }
         });
 
@@ -165,12 +192,14 @@ export default class RecordingScreen extends Component {
                         type={Camera.Constants.Type.front}
                         ref={ref => { this.camera = ref; }}
                     >
-                        <TouchableOpacity
-                            style={[styles.footer, {backgroundColor: `${this.state.isRecording ? '#ee000099' : '#78a6f299'}`}]}
-                            onPress={() => this.state.isRecording ? this.onStopRecording() : this.onStartRecording()}
-                        >
-
-                        </TouchableOpacity>
+                        <View style={styles.footer}>
+                            <RecordingButton
+                                style={styles.recodingButton}
+                                isRecording={this.state.isRecording}
+                                onStartPress={this.onStartRecording}
+                                onStopPress={this.onStopRecording}
+                            />
+                        </View>
                     </Camera>
                 </View>
             );
