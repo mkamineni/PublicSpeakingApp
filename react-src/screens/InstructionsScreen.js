@@ -15,7 +15,7 @@ export default class InstructionsScreen extends Component {
                 fontFamily: 'latoLight',
                 color: 'white',
                 fontSize: 28,
-                margin: 10,
+                margin: 10
             },
             label: {
                 fontSize: 20,
