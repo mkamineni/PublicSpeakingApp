@@ -70,7 +70,7 @@ export default class RecordingScreen extends Component {
         this.setState({ loading: 'analyzeVideo'}); //check the loading prop in lower components, if its not an empty string display a loading circle
         const body = { form: fileUrl };
         console.log(fileUrl, body, JSON.stringify(body))
-        fetch(`http://18.18.182.12:5000/analyze/`, {
+        fetch(`http://18.40.89.152:5000/analyze/`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -78,26 +78,26 @@ export default class RecordingScreen extends Component {
             },
             body: JSON.stringify(body),
         })
-            .then(res => console.log(res));//.json())
-            // .then(
-            //     obj => {
-            //         const data = obj.data;
-            //         this.setState({
-            //             loading: '',
-            //             msg: 'Video uploaded',
-            //             data: [ obj.data ]
-            //         });
-            //         console.log('video uploade');
-            //     },
-            //     error => {
-            //         this.setState({
-            //             loading: '', 
-            //             msg: 'Error uploading video'
-            //         });
-            //         console.log('ERROR:');
-            //         console.error(error);
-            //     }
-            // );
+            .then(res => res.json());//.json())
+            .then(
+                obj => {
+                    const data = obj[0]; //depends on what we want to display first, we are returned len3 tuple
+                    this.setState({
+                        loading: '',
+                        msg: 'Video analyzed',
+                        data: [ data ]
+                    });
+                    console.log('video analyzed');
+                },
+                error => {
+                    this.setState({
+                        loading: '', 
+                        msg: 'Error analyzing video'
+                    });
+                    console.log('ERROR:');
+                    console.error(error);
+                }
+            );
     }
 
     handleData = { //contains functions, maybe like retrieveGraph or something
