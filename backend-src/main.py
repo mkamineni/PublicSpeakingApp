@@ -11,7 +11,7 @@ def hello_world():
 def analyze_video():
 	app.logger.info('Hello world!')
 	body = request.get_json()
-	app.logger.info('BODY',body)
+	#app.logger.info('BODY',body)
 	output = ""
 	if body and body.form and body.form.fileUrl:
 		result = process_audio(body.form.fileUrl)
