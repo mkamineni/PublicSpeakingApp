@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, CameraRoll } from 'react-native';
 import { Camera, Permissions } from 'expo';
+import { RNS3 } from 'react-native-aws3';
+
+//GOOGLE_APPLICATION_CREDENTIALS;
+
 
 export default class RecordingScreen extends Component {
     constructor(props){
@@ -11,6 +15,9 @@ export default class RecordingScreen extends Component {
             isRecording: false,
             fileUrl: null,
             isDoneRecording: false,
+            loading: '',
+            msg: '',
+            data: [],
         };
     }
     
@@ -24,6 +31,83 @@ export default class RecordingScreen extends Component {
         });
     }
 
+    uploadVideo(fileUrl) {
+        const AWS_ACCESS_KEY_ID = "AKIAJ5IUOSK4W5CUUHOQ";
+        const AWS_SECRET_ACCESS_KEY = "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";
+       
+        const file = {
+            // `uri` can also be a file system path (i.e. file://)
+            uri: fileUrl,
+            name: "speech.mov",
+            type: "mov"
+        }
+
+        const options = {
+            keyPrefix: "uploads/",
+            bucket: "public-speech",
+            region: "us-east-1",
+            accessKey: AWS_ACCESS_KEY_ID,
+            secretKey: AWS_SECRET_ACCESS_KEY,
+            successActionStatus: 201
+        }
+
+        RNS3.put(file, options).then(response => {
+            if (response.status !== 201)
+                throw new Error("Failed to upload image to S3");
+            else {
+                this.analyzeVideo(response.body);
+        }
+        /**
+         * {
+         *   postResponse: {
+         *     bucket: "your-bucket",
+         *     etag : "9f620878e06d28774406017480a59fd4",
+         *     key: "uploads/image.png",
+         *     location: "https://your-bucket.s3.amazonaws.com/uploads%2Fimage.png"
+         *   }
+         * }
+         */
+        });
+    }
+
+    
+
+    analyzeVideo(fileUrl) {
+        this.setState({ loading: 'analyzeVideo'}); //check the loading prop in lower components, if its not an empty string display a loading circle
+        const body = { form: fileUrl };
+        console.log(JSON.stringify(body));
+        fetch(`/api/analyze`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body),
+        })
+            .then(res => res.json())
+            .then(
+                obj => {
+                    const data = obj.data;
+                    this.setState({
+                        loading: '',
+                        msg: 'Video uploaded',
+                        data: [ obj.data ]
+                    });
+                    console.log('video uploade');
+                },
+                error => {
+                    this.setState({
+                        loading: '', 
+                        msg: 'Error uploading video'
+                    });
+                    console.error(error);
+                }
+            );
+    }
+
+    handleData = { //contains functions, maybe like retrieveGraph or something
+        uploadVideo: this.uploadVideo
+    }
+
     onStartRecording = async () => {
         if (this.camera) {
           this.setState({ isRecording: true, fileUrl: null });
@@ -31,7 +115,8 @@ export default class RecordingScreen extends Component {
             .then((file) => {
               this.setState({ fileUrl: file.uri});
               CameraRoll.saveToCameraRoll(file.uri, "video");
-            })
+              this.uploadVideo(file.uri);
+            });
         }
     }
 
