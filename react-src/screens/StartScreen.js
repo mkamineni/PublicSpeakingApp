@@ -10,9 +10,14 @@ export default class StartScreen extends Component {
                 flex: 1,
                 backgroundColor: '#78a6f2'
             },
+            button: {
+                backgroundColor: '#fff8',
+                borderRadius: 5,
+                padding: 15,
+            },
             text: {
                 fontFamily: 'latoLight',
-                color: 'white',
+                color: '#78a6f2',
                 fontSize: 28,
             }
         });
@@ -22,6 +27,7 @@ export default class StartScreen extends Component {
             <View style={styles.container}>
                 <TouchableOpacity
                     onPress={() => navigate('Instructions')}
+                    style={styles.button}
                 >
                     <Text style={styles.text}>START RECORDING</Text>
                 </TouchableOpacity>

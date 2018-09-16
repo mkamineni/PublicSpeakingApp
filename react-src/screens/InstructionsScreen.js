@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import { PhoneRotateLandscapeIcon } from 'mdi-react'
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default class InstructionsScreen extends Component {
     render() {
@@ -12,24 +12,38 @@ export default class InstructionsScreen extends Component {
                 backgroundColor: '#78a6f2'
             },
             text: {
-                fontFamily: 'latoBold',
+                fontFamily: 'latoLight',
                 color: 'white',
                 fontSize: 28,
-            }
+                margin: 10,
+            },
+            label: {
+                fontSize: 20,
+                color: '#78a6f2',
+                fontFamily: 'latoRegular',
+            },
+            button: {
+                marginTop: 80,
+                backgroundColor: '#fff8',
+                borderRadius: 5,
+                padding: 15,
+            },
         });
 
         const { navigate } = this.props.navigation;
         return(
             <View style={styles.container}>
-                <PhoneRotateLandscapeIcon
-                    size={25}
-                    color="#0009"
+                <MaterialIcons
+                    name="center-focus-weak"
+                    size={50}
+                    color={'#fff9'}
                 />
                 <Text style={styles.text}>Center yourself in the camera.</Text>
                 <TouchableOpacity
                     onPress={() => navigate('Recording')}
+                    style={styles.button}
                 >
-                    <Text style={styles.text}>I'M READY!</Text>
+                    <Text style={styles.label}>I'M READY!</Text>
                 </TouchableOpacity>
             </View>
         )
