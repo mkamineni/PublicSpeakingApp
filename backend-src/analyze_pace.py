@@ -37,4 +37,4 @@ def process_response(response):
 	if num_commas:
 		pause_after_comma=total_space_after_comma/num_commas
 
-	return pause_after_sent, pause_after_comma, words_per_min, time_length
+	return pause_after_sent, pause_after_comma, words_per_min, end

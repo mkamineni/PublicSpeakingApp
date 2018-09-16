@@ -1,6 +1,7 @@
 import requests
 from time import sleep
 import urllib2
+import ffmpy
 
 import analyze_tone
 import analyze_pace
@@ -14,14 +15,21 @@ with open(filler_file, "r+") as f:
 		filler_words.add(line.strip())
 
 def process_audio(url, ID=None):
-	response=audio_to_text(ID, url)
+	rsp = urllib2.urlopen('url')
+	with open("video.mov",'wb') as f:
+		f.write(rsp.read())
+
+	ff = ffmpy.FFmpeg(
+	     inputs={'video.mov': None},
+	    outputs={'output.mp3': None}
+	    )
+	ff.run()
+
+	response=audio_to_text(ID, 'output.mp3')
 	output, tokens, colors, filler_freqs=get_text_and_fillers(response)
 	tone_of_text=analyze_tone.process_text(output)
 	pause_after_sent, pause_after_comma, words_per_min, time_length=analyze_pace.process_response(response)
 
-	rsp = urllib2.urlopen(url)
-	with open("video.mov",'wb') as f:
-    	f.write(rsp.read())
 	off_center_counter=evaluate_focus("video.mov")
 	average_focus=time_length/off_center_counter
 
@@ -40,7 +48,7 @@ def process_audio(url, ID=None):
 
 	return ((tokens, colors), (users_stats, ideal_stats), (data, smile))
 
-def audio_to_text(ID, media_url):
+def audio_to_text(ID, file):
 	'''
 	This function generates a dictionary representation of text from an audio file using the REV API. 
 	'''
@@ -55,9 +63,8 @@ def audio_to_text(ID, media_url):
 		}
 
 		url = "https://api.rev.ai/revspeech/v1beta/jobs"
-		payload = {'media_url': media_url,
-			'metadata': "Test"}
-		response = requests.post(url, headers=headers, json=payload)
+		files = { 'media': (file, open(file, 'rb'), 'audio/mp3') }
+		response = requests.post(url, headers=headers, files=files)
 
 		response=response.json()
 		ID=response["id"]
@@ -94,5 +101,5 @@ def get_text_and_fillers(response2):
 	return output, text_portions, colors, filler_freqs
 
 
-url = "https://support.rev.com/hc/en-us/article_attachments/200043975/FTC_Sample_1_-_Single.mp3"
-print("OUTPUT:", "\n", "\n", "\n", str(process_audio(url)))
+# url = "https://support.rev.com/hc/en-us/article_attachments/200043975/FTC_Sample_1_-_Single.mp3"
+# print("OUTPUT:", "\n", "\n", "\n", str(process_audio(url)))
