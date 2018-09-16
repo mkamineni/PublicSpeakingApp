@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 
-export default class FillerScreen extends Component {
+export default class SpeechStatScreen extends Component {
     constructor(props){
         super(props);
         this.state = {
             loading: '',
             msg: '',
-            data: [], //initialize data here from params
+            data: [],
         };
     }
     componentDidMount() {
@@ -39,17 +39,23 @@ export default class FillerScreen extends Component {
             },
         });
         const { navigate } = this.props.navigation;
-        const fillerData = navigate.getParam("screenData", "")[0];
+        const speechStatData = navigate.getParam("screenData", "")[1];
         return(
             <ScrollView style ={styles.scrollContainer}>
                 <Text style={styles.text}>
-                    {fillerData}
+                    {speechStatData}
                 </Text>
                 <TouchableOpacity
-                    onPress={() => navigate('SpeechStat'), {screenData: this.state.data}}
+                    onPress={() => navigate('Recording')}
                     style={styles.button}
                 >
-                <Text style={styles.label}>View speech statistics!</Text>
+                    <Text style={styles.label}>next!</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => navigate.goBack()}
+                    style={styles.button}
+                >
+                    <Text style={styles.label}>back!</Text>
                 </TouchableOpacity>
             </ScrollView>
         )
