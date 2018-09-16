@@ -12,7 +12,7 @@ export default class FillerScreen extends Component {
     }
     componentDidMount() {
         this.setState({
-            data: [this.props.getParam("screenData", [])]
+            data: [this.props.navigation.getParam("screenData", [])]
         })
     }
     render() {
@@ -39,7 +39,7 @@ export default class FillerScreen extends Component {
             },
         });
         const { navigate } = this.props.navigation;
-        const fillerData = navigate.getParam("screenData", "")[0];
+        const fillerData = this.props.navigation.getParam("screenData", "")[0];
         return(
             <ScrollView style ={styles.scrollContainer}>
                 <Text style={styles.text}>

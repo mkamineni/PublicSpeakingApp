@@ -12,7 +12,7 @@ export default class SpeechStatScreen extends Component {
     }
     componentDidMount() {
         this.setState({
-            data: [this.props.getParam("screenData", [])]
+            data: [this.props.navigation.getParam("screenData", [])]
         })
     }
     render() {
@@ -38,7 +38,7 @@ export default class SpeechStatScreen extends Component {
             },
         });
         const { navigate } = this.props.navigation;
-        const speechStatData = navigate.getParam("screenData", "")[1];
+        const speechStatData = this.props.navigation.getParam("screenData", "")[1];
         return(
             <ScrollView style ={styles.scrollContainer}>
                 <Text style={styles.text}>
