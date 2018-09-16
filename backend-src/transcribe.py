@@ -9,19 +9,19 @@ with open(filler_file, "r+") as f:
 	for line in f:
 		filler_words.add(line.strip())
 
-def process_audio(ID=None):
-	response=audio_to_text(ID)
-	output, portions, colors=get_text_and_fillers(response)
+def process_audio(file, ID=None):
+	response=audio_to_text(ID, file)
+	output, portions, colors, filler_freqs=get_text_and_fillers(response)
 	tone=analyze_tone.process_text(output)
 	pause_after_sent, pause_after_comma, words_per_min=analyze_pace.process_response(response)
 
 	results_dict={"string_output": output, "tokens": portions, 
-				"colors_dict": colors, "tone": tone, "pause_after_sent": pause_after_sent, 
-				"pause_after_comma": pause_after_comma, "words_per_min": words_per_min}
+				"colors_dict": colors, "filler_freqs": filler_freqs, "tone": tone, 
+				"pause_after_sent": pause_after_sent, "pause_after_comma": pause_after_comma, "words_per_min": words_per_min}
 
 	return results_dict
 
-def audio_to_text(ID):
+def audio_to_text(ID, file):
 	'''
 	This function generates a dictionary representation of text from an audio file using the REV API. 
 	'''
@@ -32,13 +32,20 @@ def audio_to_text(ID):
 
 	if ID==None:
 		headers = {
-		    'Authorization': 'Bearer 01wXudOy88gdkI2HgWeZUrc1WEp5GtFA5XK9KFNv6O7ucF6e5Nwe47CXm3cAbMAFHML56xeOQy0Ya99FFVwF7dqrzitwc',
-		    'Content-Type': 'application/json',
+		    'Authorization': 'Bearer 01wXudOy88gdkI2HgWeZUrc1WEp5GtFA5XK9KFNv6O7ucF6e5Nwe47CXm3cAbMAFHML56xeOQy0Ya99FFVwF7dqrzitwc'
 		}
 
-		data = '{"media_url":"https://support.rev.com/hc/en-us/article_attachments/200043975/FTC_Sample_1_-_Single.mp3","metadata":"This is a sample submit jobs option"}'
+		url = "https://api.rev.ai/revspeech/v1beta/jobs"
+		files = { 'media': (file, open(file, 'rb'), 'audio/mp3') }
+		response = requests.post(url, headers=headers, files=files)
+		if response.status_code != 200:
+		    raise Exception
 
-		response = requests.post('https://api.rev.ai/revspeech/v1beta/jobs', headers=headers, data=data).json()
+		#data = '{"media_url":"https://support.rev.com/hc/en-us/article_attachments/200043975/FTC_Sample_1_-_Single.mp3","metadata":"This is a sample submit jobs option"}'
+		#response = requests.post('https://api.rev.ai/revspeech/v1beta/jobs', headers=headers, data=data).json()
+
+		#response = requests.post('https://api.rev.ai/revspeech/v1beta/jobs', headers=headers, files=files).json()
+		response=response.json()
 		ID=response["id"]
 
 		status=response["status"]
@@ -53,6 +60,7 @@ def audio_to_text(ID):
 
 def get_text_and_fillers(response2):
 	colors={"blue": set()}
+	filler_freqs={}
 	text_portions=[]
 	output=""
 	parts=response2["monologues"][0]["elements"]
@@ -61,13 +69,19 @@ def get_text_and_fillers(response2):
 		elem=parts[ind]
 		text_portions.append(elem["value"])
 		output+=elem["value"]
-		if elem["value"].lower() in filler_words:
+
+		word=elem["value"].lower()
+		if word in filler_words:
 			print("F: "+elem["value"]+"\n")
+			if word not in filler_freqs:
+				filler_freqs[word]=0
+			filler_freqs[word]+=1
 			colors["blue"].add(ind)
 
 	print("OUT:", output, "\n")
 
-	return output, text_portions, colors
+	return output, text_portions, colors, filler_freqs
 
 
-print("OUTPUT:", "\n", "\n", "\n", str(process_audio()))
+file="another_one.mp3"
+print("OUTPUT:", "\n", "\n", "\n", str(process_audio(file)))

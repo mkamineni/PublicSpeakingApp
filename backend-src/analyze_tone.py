@@ -11,11 +11,17 @@ def process_text(text):
 
 	tone_analysis = tone_analyzer.tone(
 		{'text': text},'application/json').get_result()
-	document_tones=json.dumps(tone_analysis, indent=2)["document_tone"]["tones"]
-	processed_tones=[]
+	#original=json.dumps(tone_analysis, indent=2)
+	#print(original)
+	document_tones=tone_analysis["document_tone"]["tones"]
+	processed_tones={}
+	overall_score=0
 	for elem in document_tones:
 		tone_val=elem["tone_id"]
 		score=elem["score"]
-		processed_tones.append((tone_val, score))
+		processed_tones[tone_val]=score
+		overall_score+=score
 
+	for tone in processed_tones:
+		processed_tones[tone]=/overall_score
 	return processed_tones

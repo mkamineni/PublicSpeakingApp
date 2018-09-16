@@ -1,7 +1,7 @@
 
 
 def process_response(response):
-	parts=response2["monologues"][0]["elements"]
+	parts=response["monologues"][0]["elements"]
 	total_space_after_period, num_periods=0, 0
 	total_space_after_comma, num_commas=0, 0 
 
@@ -15,7 +15,8 @@ def process_response(response):
 			total_space_after_comma+=end-elem["ts"]
 			num_commas+=1
 
-		end=elem["end_ts"]
+		if "end_ts" in elem:
+			end=elem["end_ts"]
 
 		#reset the last value
 		value=elem["value"]
