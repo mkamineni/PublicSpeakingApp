@@ -11,6 +11,9 @@ def hello_world():
 
 @app.route('/analyze', methods=['POST'])
 def analyze_video():
+	print('Hello world!', file=sys.stderr)
 	body = request.get_json()
-    output = audio_to_text(body)
+	print(body, file=sys.stderr)
+	output = audio_to_text(body)
+	print('OUTPUT HERE', file=sys.stderr)
 	return output
