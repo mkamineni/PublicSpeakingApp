@@ -11,8 +11,9 @@ export default class StartScreen extends Component {
                 backgroundColor: '#78a6f2'
             },
             text: {
-                fontFamily: 'latoBold',
+                fontFamily: 'latoLight',
                 color: 'white',
+                fontSize: 28,
             }
         });
 

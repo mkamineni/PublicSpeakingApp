@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { PhoneRotateLandscapeIcon } from 'mdi-react'
 
 export default class InstructionsScreen extends Component {
     render() {
@@ -13,13 +14,18 @@ export default class InstructionsScreen extends Component {
             text: {
                 fontFamily: 'latoBold',
                 color: 'white',
+                fontSize: 28,
             }
         });
 
         const { navigate } = this.props.navigation;
         return(
             <View style={styles.container}>
-                <Text style={styles.text}>Hi. This is great!</Text>
+                <PhoneRotateLandscapeIcon
+                    size={25}
+                    color="#0009"
+                />
+                <Text style={styles.text}>Center yourself in the camera.</Text>
                 <TouchableOpacity
                     onPress={() => navigate('Recording')}
                 >
