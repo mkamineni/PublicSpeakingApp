@@ -1,4 +1,5 @@
 # Pitch Perfect
+Jessica Yin, Kaveri Nadhamuni, Shannen Wu, Meghana Kamineni
 
 User Manual
 1. Open the mobile app, Pitch Perfect, and position the phone so it is secured in front of you, roughly at eye level.
