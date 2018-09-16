@@ -70,7 +70,7 @@ export default class RecordingScreen extends Component {
         this.setState({ loading: 'analyzeVideo'}); //check the loading prop in lower components, if its not an empty string display a loading circle
         const body = { form: fileUrl };
         console.log(fileUrl, body, JSON.stringify(body))
-        fetch(`http://juicy.local:5000/analyze/`, {
+        fetch(`http://900c801b.ngrok.io:5000/analyze/`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -78,11 +78,9 @@ export default class RecordingScreen extends Component {
             },
             body: JSON.stringify(body),
         })
-            .then(res => {
-                console.log(res);
-                console.log(obj[0], obj[1], obj[2]);
-                res = res.json();
-                const data = obj[0]; //depends on what we want to display first, we are returned len3 tuple
+            .then(res => res = res.json())
+            .then(obj => {
+                const data = obj; //depends on what we want to display first, we are returned len3 tuple
                 this.setState({
                     loading: '',
                     msg: 'Video analyzed',
