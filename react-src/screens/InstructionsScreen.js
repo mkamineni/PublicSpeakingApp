@@ -16,7 +16,6 @@ export default class InstructionsScreen extends Component {
                 color: 'white',
                 fontSize: 28,
                 margin: 10,
-                textAlign: 'center',
             },
             label: {
                 fontSize: 20,

@@ -19,6 +19,7 @@ export default class RecordingScreen extends Component {
             data: [],
         };
     }
+
     
     async componentWillMount() {
         const { status } = await Permissions.askAsync(Permissions.CAMERA, Permissions.AUDIO_RECORDING);
@@ -113,7 +114,11 @@ export default class RecordingScreen extends Component {
                     'Would you like to analyze this video?',
                     [
                         {text: 'Cancel', onPress: () => this.cancelVideo()},
-                        {text: 'OK', onPress: () => this.useVideo(file.uri)},
+                        {text: 'OK', onPress: () => {
+                            this.useVideo(file.uri); 
+                            this.props.navigation.navigate("Filler", {screenData: this.state.data});
+                            }
+                        },
                     ],
                     { cancelable: false }
                 );

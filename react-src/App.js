@@ -3,7 +3,9 @@ import Expo from 'expo';
 import { createStackNavigator } from 'react-navigation';
 import StartScreen from './screens/StartScreen';
 import InstructionsScreen from './screens/InstructionsScreen';
-import RecordingScreen from './screens/RecordingScreen'
+import RecordingScreen from './screens/RecordingScreen';
+import FillerScreen from './screens/FillerScreen';
+import SpeechStatScreen from './screens/SpeechStatScreen';
 
 const latoBlack = require('./assets/fonts/Lato-Black.ttf');
 const latoBlackItalic = require('./assets/fonts/Lato-BlackItalic.ttf');
@@ -54,13 +56,15 @@ export default class App extends Component{
     const App = createStackNavigator({
       Start: { screen: StartScreen },
       Instructions: { screen: InstructionsScreen },
-      Recording: { screen: RecordingScreen }
+      Recording: { screen: RecordingScreen },
+      Filler: { screen: FillerScreen },
+      SpeechStat: {screen: SpeechStatScreen}
       //Statistics: { screen: StatisticsScreen }
     },
     {
       headerMode: 'none',
       navigationOptions: {
-        headerVisible: false,
+      headerVisible: false,
       }
     });
 
