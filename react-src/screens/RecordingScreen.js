@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Camera, Permissions } from 'expo';
 
 export default class RecordingScreen extends Component {
@@ -41,8 +41,24 @@ export default class RecordingScreen extends Component {
         if (hasCameraPermission === null || hasAudioPermission === null) {
             return <View style={styles.container} />;
         } else if (hasCameraPermission === false || hasAudioPermission === false) {
-            navigate('Start');
-            return <View style={styles.container} />;
+            Alert.alert(
+                'Permissions',
+                'Please go to Settings and allow the app to use the camera and microphone.',
+                [
+                    {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                    {text: 'OK', onPress: () => {
+                    this.setState({
+                        hasCameraPermission: null,
+                        hasAudioPermission: null
+                    });
+                    navigate('Start');
+                    }},
+                ],
+                { cancelable: false }
+            );
+            return (
+                <View style={styles.container} />
+            );
         } else {
             return(
                 <View style={styles.container}>

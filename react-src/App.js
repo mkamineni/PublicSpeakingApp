@@ -17,10 +17,13 @@ const latoLightItalic = require('./assets/fonts/Lato-LightItalic.ttf');
 const latoRegular = require('./assets/fonts/Lato-Regular.ttf');
 
 export default class App extends Component{
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
-      fontLoaded: false
+      fontLoaded: false,
+      loading: '',
+      msg: '',
+      data: []
     };
   }
 
@@ -43,6 +46,42 @@ export default class App extends Component{
       latoRegular
     });
     this.setState({ fontLoaded: true });
+  }
+
+  //define more functions later as needed
+
+  sendVideo(page, values) {
+    this.setState({ loading: 'sendVideo'}); //check the loading prop in lower components, if its not an empty string display a loading circle
+    const body = { form: values};
+    fetch(`/api/send`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body),
+    })
+      .then(res => res.json())
+      .then(
+        obj => {
+          const data = obj.data;
+          this.setState({
+            loading: '',
+            msg: 'Video sent',
+            data: [ obj.data ]
+          });
+        },
+        error => {
+          this.setState({
+            loading: '', 
+            msg: 'Error sending video'
+          });
+          console.error(error);
+        }
+      );
+  }
+
+  handleData = { //contains functions, maybe like retrieveGraph or something
+    sendVideo: this.sendVideo
   }
 
   render() {
