@@ -2,6 +2,7 @@ import requests
 from time import sleep
 import analyze_tone
 import analyze_pace
+from image_analysis import process_video
 
 filler_file="filler_words.txt"
 filler_words=set()
@@ -9,19 +10,28 @@ with open(filler_file, "r+") as f:
 	for line in f:
 		filler_words.add(line.strip())
 
-def process_audio(file, ID=None):
-	response=audio_to_text(ID, file)
-	output, portions, colors, filler_freqs=get_text_and_fillers(response)
-	tone=analyze_tone.process_text(output)
+def process_audio(url, ID=None):
+	response=audio_to_text(ID, url)
+	output, tokens, colors, filler_freqs=get_text_and_fillers(response)
+	tone_of_text=analyze_tone.process_text(output)
 	pause_after_sent, pause_after_comma, words_per_min=analyze_pace.process_response(response)
 
-	results_dict={"string_output": output, "tokens": portions, 
-				"colors_dict": colors, "filler_freqs": filler_freqs, "tone": tone, 
-				"pause_after_sent": pause_after_sent, "pause_after_comma": pause_after_comma, "words_per_min": words_per_min}
+	percentage_filler=sum(filler_freqs[freq] for freq in filler_freqs)/len(tokens)
+	users_stats=[pause_after_sent, pause_after_comma, words_per_min, percentage_filler, filler_freqs, tone_of_text]
+	ideal_stats=[2, 1, 150, 0, None, None]
 
-	return results_dict
+	smile, datasets=process_video(url)
 
-def audio_to_text(ID, file):
+	data={}
+	for tone in datasets:
+		new_set=[]
+		for point in datasets[tone]:
+			new_set.append({"x":point[0], "y": point[1]})
+		data[tone]=new_set
+
+	return ((tokens, colors), (users_stats, ideal_stats), (data, smile))
+
+def audio_to_text(ID, media_url):
 	'''
 	This function generates a dictionary representation of text from an audio file using the REV API. 
 	'''
@@ -36,15 +46,10 @@ def audio_to_text(ID, file):
 		}
 
 		url = "https://api.rev.ai/revspeech/v1beta/jobs"
-		files = { 'media': (file, open(file, 'rb'), 'audio/mp3') }
-		response = requests.post(url, headers=headers, files=files)
-		if response.status_code != 200:
-		    raise Exception
+		payload = {'media_url': media_url,
+			'metadata': "Test"}
+		response = requests.post(url, headers=headers, json=payload)
 
-		#data = '{"media_url":"https://support.rev.com/hc/en-us/article_attachments/200043975/FTC_Sample_1_-_Single.mp3","metadata":"This is a sample submit jobs option"}'
-		#response = requests.post('https://api.rev.ai/revspeech/v1beta/jobs', headers=headers, data=data).json()
-
-		#response = requests.post('https://api.rev.ai/revspeech/v1beta/jobs', headers=headers, files=files).json()
 		response=response.json()
 		ID=response["id"]
 
@@ -72,16 +77,13 @@ def get_text_and_fillers(response2):
 
 		word=elem["value"].lower()
 		if word in filler_words:
-			print("F: "+elem["value"]+"\n")
 			if word not in filler_freqs:
 				filler_freqs[word]=0
 			filler_freqs[word]+=1
 			colors["blue"].add(ind)
 
-	print("OUT:", output, "\n")
-
 	return output, text_portions, colors, filler_freqs
 
 
-file="another_one.mp3"
-print("OUTPUT:", "\n", "\n", "\n", str(process_audio(file)))
+url = "https://support.rev.com/hc/en-us/article_attachments/200043975/FTC_Sample_1_-_Single.mp3"
+print("OUTPUT:", "\n", "\n", "\n", str(process_audio(url)))
