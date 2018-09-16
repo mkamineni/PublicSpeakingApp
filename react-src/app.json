@@ -1,5 +1,7 @@
 {
+  "name": "react-src",
+  "displayName": "react-src",
   "expo": {
-    "sdkVersion": "27.0.0"
+    "sdkVersion": "28.0.0"
   }
 }
