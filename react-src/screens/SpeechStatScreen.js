@@ -32,7 +32,6 @@ export default class SpeechStatScreen extends Component {
                 fontFamily: 'latoRegular',
             },
             button: {
-                marginTop: 80,
                 backgroundColor: '#fff8',
                 borderRadius: 5,
                 padding: 15,

@@ -118,7 +118,7 @@ export default class RecordingScreen extends Component {
                         {text: 'Cancel', onPress: () => this.cancelVideo()},
                         {text: 'OK', onPress: () => {
                             this.useVideo(file.uri); 
-                            this.props.navigation.navigate("Filler", {screenData: data});
+                            this.props.navigation.navigate("Filler", {screenData: this.state.data});
                             }
                         },
                     ],
