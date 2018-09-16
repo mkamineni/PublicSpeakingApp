@@ -1,9 +1,11 @@
 import requests
+import flask
 from time import sleep
 import urllib.request
 
 import analyze_tone
 import analyze_pace
+import json
 from track_eyes import evaluate_focus
 from image_analysis import process_video
 
@@ -41,7 +43,7 @@ def process_audio(url, ID=None):
             new_set.append({"x":point[0], "y": point[1]})
         data[tone]=new_set
 
-    return ((tokens, colors), (users_stats, ideal_stats), (data, smile))
+    return flask.jsonify({'text':{'tokens':tokens, 'colors':colors}, 'stats':{'user':users_stats, 'ideal':ideal_stats}, 'tone':{'data':data, 'smile':smile}})
 
 def audio_to_text(ID, media_url):
     '''
@@ -97,5 +99,5 @@ def get_text_and_fillers(response2):
     return output, text_portions, colors, filler_freqs
 
 
-url = "https://support.rev.com/hc/en-us/article_attachments/200043975/FTC_Sample_1_-_Single.mp3"
-print("OUTPUT:", "\n", "\n", "\n", str(process_audio(url)))
+#url = "https://support.rev.com/hc/en-us/article_attachments/200043975/FTC_Sample_1_-_Single.mp3"
+#print("OUTPUT:", "\n", "\n", "\n", str(process_audio(url)))
