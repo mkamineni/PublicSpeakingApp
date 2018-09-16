@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, CameraRoll } from 'react-native';
 import { Camera, Permissions } from 'expo';
 import { RNS3 } from 'react-native-aws3';
-
-//GOOGLE_APPLICATION_CREDENTIALS;
+import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } from '../secret';
 
 
 export default class RecordingScreen extends Component {
@@ -32,11 +31,7 @@ export default class RecordingScreen extends Component {
     }
 
     uploadVideo(fileUrl) {
-        const AWS_ACCESS_KEY_ID = "AKIAJ5IUOSK4W5CUUHOQ";
-        const AWS_SECRET_ACCESS_KEY = "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";
-       
         const file = {
-            // `uri` can also be a file system path (i.e. file://)
             uri: fileUrl,
             name: "speech.mov",
             type: "mov"
@@ -52,10 +47,11 @@ export default class RecordingScreen extends Component {
         }
 
         RNS3.put(file, options).then(response => {
-            if (response.status !== 201)
-                throw new Error("Failed to upload image to S3");
-            else {
-                this.analyzeVideo(response.body);
+        if (response.status !== 201)
+            throw new Error(response.status);
+        else{
+            console.log(response.body.postResponse.location);
+            this.analyzeVideo(response.body.postResponse.location);
         }
         /**
          * {
@@ -70,38 +66,38 @@ export default class RecordingScreen extends Component {
         });
     }
 
-    
-
     analyzeVideo(fileUrl) {
         this.setState({ loading: 'analyzeVideo'}); //check the loading prop in lower components, if its not an empty string display a loading circle
         const body = { form: fileUrl };
-        console.log(JSON.stringify(body));
-        fetch(`/api/analyze`, {
+        console.log(fileUrl, body, JSON.stringify(body))
+        fetch(`http://18.18.182.12:5000/analyze/`, {
             method: 'POST',
             headers: {
+                'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(body),
         })
-            .then(res => res.json())
-            .then(
-                obj => {
-                    const data = obj.data;
-                    this.setState({
-                        loading: '',
-                        msg: 'Video uploaded',
-                        data: [ obj.data ]
-                    });
-                    console.log('video uploade');
-                },
-                error => {
-                    this.setState({
-                        loading: '', 
-                        msg: 'Error uploading video'
-                    });
-                    console.error(error);
-                }
-            );
+            .then(res => console.log(res));//.json())
+            // .then(
+            //     obj => {
+            //         const data = obj.data;
+            //         this.setState({
+            //             loading: '',
+            //             msg: 'Video uploaded',
+            //             data: [ obj.data ]
+            //         });
+            //         console.log('video uploade');
+            //     },
+            //     error => {
+            //         this.setState({
+            //             loading: '', 
+            //             msg: 'Error uploading video'
+            //         });
+            //         console.log('ERROR:');
+            //         console.error(error);
+            //     }
+            // );
     }
 
     handleData = { //contains functions, maybe like retrieveGraph or something

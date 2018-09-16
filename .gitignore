@@ -6,3 +6,4 @@ ios/build/
 ios/mobile-client.xcworkspace/xcuserdata/
 ios/mobile-client.xcodeproj/project.xcworkspace/
 .vscode/
+secret.js
