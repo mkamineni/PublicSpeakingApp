@@ -1,6 +1,8 @@
 from flask import Flask, request
 from flask_restful import Api
 from transcribe import process_audio
+from image_analysis import process_video
+
 app = Flask(__name__)
 api = Api(app)
 
@@ -11,8 +13,8 @@ def hello_world():
 @app.route('/send', methods=['POST'])
 def send_video():
 	body = request.get_json()
-	#may need to process body['form']
-	#get audio here!!
+
+	#get audio here and video!!
 	results_dict=process_audio(audio)
 	#call function
 
@@ -29,6 +31,15 @@ def send_video():
 	ideal_stats=[2, 1, 150, 0, None, None]
 	api.get_results(users_stats, ideal_stats)
 
-	api.get_graph_data()
+	datasets=process_video(video)
+
+	data={}
+	for tone in datasets:
+		new_set=[]
+		for point in datasets[tone]:
+			new_set.append({"x":point[0], "y": point[1]})
+		data[tone]=new_set
+	api.get_graph_data(data)
+	
     return "setup is hard"
 

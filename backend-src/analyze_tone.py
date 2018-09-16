@@ -23,5 +23,5 @@ def process_text(text):
 		overall_score+=score
 
 	for tone in processed_tones:
-		processed_tones[tone]=/overall_score
+		processed_tones[tone]=processed_tones[tone]/overall_score
 	return processed_tones
