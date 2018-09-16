@@ -70,7 +70,7 @@ export default class RecordingScreen extends Component {
         this.setState({ loading: 'analyzeVideo'}); //check the loading prop in lower components, if its not an empty string display a loading circle
         const body = { form: fileUrl };
         console.log(fileUrl, body, JSON.stringify(body))
-        fetch(`http://juicy.local:5000/analyze/`, {
+        fetch(`http://shan.local:5000/analyze/`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
